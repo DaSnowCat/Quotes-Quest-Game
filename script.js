@@ -183,6 +183,9 @@ function pathChoiceScreen() {
 }
 
 function lightPathScreen() {
+    lightPathButton.hide();
+    darkPathButton.hide();
+
     background(lightPathbgImage);
     textSize(50);
     fill('white');
@@ -228,6 +231,9 @@ function lightPathMiniGameChoicesScreen() {
 }
 
 function darkPathScreen() {
+    lightPathButton.hide();
+    darkPathButton.hide();
+
     background(darkPathbgImage);
     textSize(50);
     fill('white');
