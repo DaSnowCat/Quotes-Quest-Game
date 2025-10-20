@@ -27,7 +27,7 @@ let bgTargetBrightness = 30;
 let pulseSpeed = 0.08;
 
 //Game states
-let gameState = "playing";
+let miniGameState = "playing";
 
 //Play Again button
 let playAgainButton;
@@ -40,7 +40,7 @@ function setup() {
 
     //Play Again button
     playAgainButton = createButton("Play Again");
-    playAgainButton.position(width/2 - 60, height/2 + 50);
+    playAgainButton.position(width / 2 - 60, height / 2 + 50);
     playAgainButton.size(120, 50);
     playAgainButton.style("font-size", "20px");
     playAgainButton.style("background-color", "purple");
@@ -56,16 +56,16 @@ function draw() {
     background(bgBrightness, 0, 60); // dark purple base
 
     //Game logic
-    if (gameState === "playing") {
+    if (miniGameState === "playing") {
         playGame();
-    } 
-    else if (gameState === "win") {
-            showWinScreen();
     }
-    else if (gameState === "lose") {
+    else if (miniGameState === "win") {
+        showWinScreen();
+    }
+    else if (miniGameState === "lose") {
         showLoseScreen();
     }
-    
+
 }
 
 function playGame() {
@@ -93,7 +93,7 @@ function playGame() {
     }
 
     // Update and draw orbs
-    for (let i = orbs.length - 1; i >=0; i--) {
+    for (let i = orbs.length - 1; i >= 0; i--) {
         let orb = orbs[i];
         orb.y += orb.speed;
 
@@ -104,18 +104,18 @@ function playGame() {
             ? color(brightness, brightness, 200)
             : color(brightness * 0.8, 0, 255);
 
-    push();
-    drawingContext.shadowBlur = 50;
-    drawingContext.shadowColor = orbColor;
-    fill(orbColor);
-    ellipse(orb.x, orb.y, orb.size);
-    pop();
+        push();
+        drawingContext.shadowBlur = 50;
+        drawingContext.shadowColor = orbColor;
+        fill(orbColor);
+        ellipse(orb.x, orb.y, orb.size);
+        pop();
 
-    // Check collision with player
-    if (orb.y + orb.size/2 >= player.y - playerHeight/2 &&
-        orb.y - orb.size/2 <= player.y + playerHeight/2 &&
-        orb.x >= player.x - playerWidth/2 &&
-        orb.x <= player.x + playerWidth/2) {
+        // Check collision with player
+        if (orb.y + orb.size / 2 >= player.y - playerHeight / 2 &&
+            orb.y - orb.size / 2 <= player.y + playerHeight / 2 &&
+            orb.x >= player.x - playerWidth / 2 &&
+            orb.x <= player.x + playerWidth / 2) {
             if (orb.type === "light") {
                 score += 1;
                 playerGlow = 100; // increase glow
@@ -152,7 +152,7 @@ function playGame() {
     if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) { // D key
         player.x += playerSpeed;
     }
-    player.x = constrain(player.x, playerWidth/2, width - playerWidth/2);
+    player.x = constrain(player.x, playerWidth / 2, width - playerWidth / 2);
 
     //Check win/lose conditions
     if (score >= 20) gameState = "win";
@@ -181,7 +181,7 @@ function showWinScreen() {
     fill(255, 255, 0);
     textSize(80);
     textAlign(CENTER, CENTER);
-    text("You WIn!", width/2, height/2 - 50);
+    text("You WIn!", width / 2, height / 2 - 50);
     playAgainButton.show();
 }
 
@@ -190,7 +190,7 @@ function showLoseScreen() {
     fill(255, 0, 0);
     textSize(80);
     textAlign(CENTER, CENTER);
-    text("You Lose!", width/2, height/2-50);
+    text("You Lose!", width / 2, height / 2 - 50);
     playAgainButton.show();
 }
 

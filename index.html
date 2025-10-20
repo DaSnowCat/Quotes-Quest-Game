@@ -1,29 +1,39 @@
 <!DOCTYPE html>
-<html lang='en'>
+<html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta charset="UTF-8">
     <title>Quotes Quest</title>
-    <link href="style.css" rel="stylesheet" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- p5play -->
-    <!-- Latest p5.js -->
+    <!-- Load p5.js -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
 
+    <!-- Load planck.js (needed for p5play physics) -->
+    <script src="https://cdn.jsdelivr.net/npm/planck-js@latest/dist/planck.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/p5.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.8.0/addons/p5.sound.min.js"></script>
+    <!-- Load p5play.js -->
+    <script src="https://cdn.jsdelivr.net/npm/p5play@3.15.0/lib/p5play.js"></script>
 
+    <!-- Load your main script LAST -->
+    <script src="script.js"></script>
 
-    <!-- updated to local files  -->
-    <script src="planck.min.js"></script>
-    <script src="p5play.js"></script>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: black;
+        }
 
-
+        canvas {
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
-    <script src="script.js"></script>
 </body>
 
 </html>

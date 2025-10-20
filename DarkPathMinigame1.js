@@ -1,4 +1,4 @@
-// ---------- LIGHTPATH MINIGAME 2: INTERMEDIATE GLOWING MAZE WITH HIDDEN EXIT + MINI HALLWAY ----------
+//Welcome to my light path minigame with maze
 
 // Maze configuration
 let cols = 23;
