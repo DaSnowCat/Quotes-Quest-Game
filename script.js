@@ -188,7 +188,7 @@ function lightPathScreen() {
     fill('white');
     textAlign(CENTER, CENTER);
 
-    let story = "This is the \nlight path screen";
+    let story = "You found yourself in a strange place. \n It's cold yet filled with beautiful shades \n of light purple hues. \n Story to be continued...";
 
     // Typewriter effect
     if (typeIndex < story.length && frameCount % typingSpeed === 0) {
