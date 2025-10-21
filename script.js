@@ -19,7 +19,9 @@ let gameTitleFont;
 let enterButton;
 let lightPathButton;
 let darkPathButton;
+
 let lightMiniGameButton;
+let darkMiniGameButton;
 
 //Game State Variable
 let gameState = "welcome";
@@ -61,6 +63,38 @@ let pulseSpeed = 0.08;
 let playAgainButton;
 
 let miniGameState = "playing";
+
+// DARK PATH MINIGAME VARIABLES
+// Maze configuration
+let cols = 23;
+let rows = 23;
+let cellSize;
+let maze = [];
+
+// Player
+let playerX, playerY;
+let playerRadius = 20;
+let d_playerSpeed = 4;
+
+// Lighting
+let lightRadius = 120;
+
+// Exit
+let exitX = 21;
+let exitY = 11;
+let exitSize;
+let exitVisible = false;
+
+// Timer
+let totalTime = 60;
+let startTime;
+
+// Game state
+let darkgameState = "playing"; // "playing", "win", "lose"
+let darkInitialized = false;
+
+// Button variables
+let replayButton, continueButton;
 
 //PRELOAD FUNCTION (runs only once)
 function preload() {
@@ -110,12 +144,22 @@ function setup() {
 
     //Light MiniGame Button
     lightMiniGameButton = createButton("Light Orbs Game");
-    lightMiniGameButton.position(width / 2 + 100, height / 2 + 50);
-    lightMiniGameButton.size(150, 50);
+    lightMiniGameButton.position(width / 2 - 625, height / 2 - 20);
+    lightMiniGameButton.size(200, 50);
     lightMiniGameButton.style("background-color", "purple");
     lightMiniGameButton.style("color", "white");
     lightMiniGameButton.style("border-radius", "10px");
     lightMiniGameButton.hide();
+
+    //Dark MiniGame Button 
+    darkMiniGameButton = createButton("Dark Maze Game");
+    darkMiniGameButton.position(width / 2, height / 2 - 20);
+    darkMiniGameButton.size(200, 50);
+    darkMiniGameButton.style("background-color", "black");
+    darkMiniGameButton.style("color", "white");
+    darkMiniGameButton.style("border-radius", "10px");
+    darkMiniGameButton.hide();
+
 
     //Play Again button
     playAgainButton = createButton("Play Again");
@@ -132,13 +176,16 @@ function setup() {
 //DRAW FUNCTION (runs in a loop)
 function draw() {
 
-    //Game state management
+    //The Game States
     if (gameState === "welcome") welcomeScreen();
     else if (gameState === "pathChoice") pathChoiceScreen();
+
     else if (gameState === "lightPathScreen") lightPathScreen();
     else if (gameState === "darkPathScreen") darkPathScreen();
+
     else if (gameState === "lightPathMiniGameChoicesScreen") lightPathMiniGameChoicesScreen();
     else if (gameState === "darkPathMiniGameChoicesScreen") darkPathMiniGameChoicesScreen();
+
     else if (gameState === "lightPathMiniGame1") lightPathMiniGame1();
     else if (gameState === "darkPathMiniGame1") darkPathMiniGame1();
 
@@ -191,9 +238,9 @@ function lightPathScreen() {
     fill('white');
     textAlign(CENTER, CENTER);
 
-    let story = "You found yourself in a strange place. \n It's cold yet filled with beautiful shades \n of light purple hues. \n Story to be continued...";
-
-    // Typewriter effect
+    // let story = "You found yourself in a strange place. \n It's cold yet filled with beautiful shades \n of light purple hues. \n Story to be continued...";
+    let story = "Coming Soon"
+    // // Typewriter effect
     if (typeIndex < story.length && frameCount % typingSpeed === 0) {
         typeIndex++;
     }
@@ -225,7 +272,8 @@ function lightPathMiniGameChoicesScreen() {
     // Description
     textSize(24);
     fill('lightgrey');
-    text("Minigame 1: Catch the falling orbs!", width / 2, height / 2 - 210);
+    textAlign(LEFT, TOP);
+    text("Minigame 1: Catch the falling orbs!", width / 2 - 700, height / 2 - 100);
 
     lightMiniGameButton.show();
 }
@@ -264,7 +312,18 @@ function darkPathMiniGameChoicesScreen() {
     textSize(50);
     fill('white');
     textAlign(CENTER, CENTER);
-    text("This is the dark path mini game choices screen", width / 2, height / 3);
+    text("Dark Path Minigames", width / 2, 40);
+
+    // Description
+    textSize(24);
+    fill('lightgrey');
+    textAlign(LEFT, TOP);
+    text("MiniGame 1: Reach End of Maze", width / 2 - 700, height / 2 - 100);
+
+    darkMiniGameButton.show();
+
+
+
 }
 
 //TRANSITIONS AND EFFECTS
@@ -332,6 +391,12 @@ function mousePressed() {
             mouseY > lightMiniGameButton.y && mouseY < lightMiniGameButton.y + 50) {
             lightMiniGameButton.hide();
             gameState = "lightPathMiniGame1";
+        }
+    } else if (gameState === "darkPathMiniGameChoicesScreen") {
+        if (mouseX > darkMiniGameButton.x && mouseX < darkMiniGameButton.x + 150 &&
+            mouseY > darkMiniGameButton.y && mouseY < darkMiniGameButton.y + 50) {
+            darkMiniGameButton.hide();
+            gameState = "darkPathMiniGame1";
         }
     }
 }
@@ -457,7 +522,7 @@ function showLightWinScreen() {
     fill(255, 255, 0);
     textSize(80);
     textAlign(CENTER, CENTER);
-    text("You WIn!", width / 2, height / 2 - 50);
+    text("You Win!", width / 2, height / 2 - 50);
     playAgainButton.show();
 }
 
@@ -465,7 +530,7 @@ function showLightLoseScreen() {
     fill(255, 0, 0);
     textSize(80);
     textAlign(CENTER, CENTER);
-    text("You Lose!", width / 2, height / 2 - 50);
+    text("You Lost!", width / 2, height / 2 - 50);
     playAgainButton.show();
 }
 
@@ -496,3 +561,232 @@ function applyHoverEffect(button, normalColor, hoverColor) {
         button.style("transform", "scale(1)");
     }
 }
+
+function darkPathMiniGame1() {
+    background(10); //Mkae background dark
+    // Smooth background transition
+    if (!darkInitialized) {
+        // Run this only once
+        cellSize = min(width / cols, height / rows);
+        exitSize = cellSize * 0.8;
+        playerX = cellSize * 1.5;
+        playerY = cellSize * 1.5;
+        startTime = millis();
+        darkgameState = "playing";
+        darkInitialized = true;
+    }
+
+    // Maze layout (intermediate, 23x23 with hallway exit)
+    maze = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1],
+        [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1],
+        [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+        [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1],
+        [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1],
+        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ];
+
+
+
+    if (darkgameState === "playing") {
+        drawMaze();
+        drawPlayer();
+        drawExit();
+        handleMovement();
+        handleTimer();
+        checkWin();
+    } else if (darkgameState === "win") {
+        drawWinScreen();
+    } else if (darkgameState === "lose") {
+        drawLoseScreen();
+    }
+
+
+}
+
+function playDarkGame() {
+    drawMaze();
+    drawPlayer();
+    drawExit();
+    handleMovement();
+    handleTimer();
+    checkWin();
+
+    if (darkgameState === "win") {
+        darkminiGameState = "win";
+    } else if (darkgameState === "lose") {
+        darkminiGameState = "lost";
+    }
+}
+
+
+function drawMaze() {
+    for (let i = 0; i < cols; i++) {
+        for (let j = 0; j < rows; j++) {
+            let x = i * cellSize + cellSize / 2;
+            let y = j * cellSize + cellSize / 2;
+            let d = dist(playerX, playerY, x, y);
+            if (d < lightRadius + cellSize / 2 && maze[j][i] === 1) {
+                push();
+                let alpha = map(d, 0, lightRadius + cellSize / 2, 255, 0);
+                drawingContext.shadowBlur = 20;
+                drawingContext.shadowColor = color(150, 150, 255, alpha);
+                fill(50, 50, 80, alpha);
+                rectMode(CENTER);
+                rect(x, y, cellSize, cellSize);
+                pop();
+            }
+        }
+    }
+}
+
+function drawPlayer() {
+    // Lighting effect
+    push();
+    noStroke();
+    let gradient = drawingContext.createRadialGradient(playerX, playerY, 0, playerX, playerY, lightRadius);
+    gradient.addColorStop(0, 'rgba(255,255,200,0.8)');
+    gradient.addColorStop(1, 'rgba(10,0,20,0)');
+    drawingContext.fillStyle = gradient;
+    ellipse(playerX, playerY, lightRadius * 2);
+    pop();
+
+    // Glowing orb
+    push();
+    drawingContext.shadowBlur = 40;
+    drawingContext.shadowColor = color(255, 255, 200);
+    fill(255, 255, 180);
+    ellipse(playerX, playerY, playerRadius * 2);
+    pop();
+}
+
+function drawExit() {
+    let ex = exitX * cellSize + cellSize / 2;
+    let ey = exitY * cellSize + cellSize / 2;
+    let distanceToExit = dist(playerX, playerY, ex, ey);
+
+    if (distanceToExit < cellSize * 3) {
+        exitVisible = true;
+    }
+
+    if (exitVisible) {
+        push();
+        fill(0, 255, 0, 200);
+        drawingContext.shadowBlur = 30;
+        drawingContext.shadowColor = color(0, 255, 0);
+        rectMode(CENTER);
+        rect(ex, ey, cellSize * 0.8, cellSize * 0.8);
+        pop();
+    }
+}
+
+function handleMovement() {
+    let nextX = playerX;
+    let nextY = playerY;
+
+    if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) nextX -= d_playerSpeed;
+    if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) nextX += d_playerSpeed;
+    if (keyIsDown(UP_ARROW) || keyIsDown(87)) nextY -= d_playerSpeed;
+    if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) nextY += d_playerSpeed;
+
+    let i = floor(nextX / cellSize);
+    let j = floor(nextY / cellSize);
+
+    if (maze[j][i] === 0) {
+        playerX = nextX;
+        playerY = nextY;
+    }
+}
+
+function handleTimer() {
+    let elapsed = (millis() - startTime) / 1000;
+    let remaining = max(0, totalTime - elapsed);
+
+    fill(255);
+    textSize(32);
+    textAlign(RIGHT, TOP);
+    text("Time: " + remaining.toFixed(0), width - 20, 20);
+
+    if (remaining <= 0) darkgameState = "lose";
+}
+
+function checkWin() {
+    let px = floor(playerX / cellSize);
+    let py = floor(playerY / cellSize);
+    if (exitVisible && px === exitX && py === exitY) {
+        darkgameState = "win";
+    }
+}
+
+function drawWinScreen() {
+    background(0, 100, 0);
+    fill(255);
+    textSize(64);
+    textAlign(CENTER, CENTER);
+    text("You Escaped!", width / 2, height / 2);
+
+    // Continue button
+    if (!continueButton) {
+        continueButton = createButton("Continue");
+        continueButton.position(width / 2 - 60, height / 2 + 80);
+        continueButton.size(120, 40);
+        continueButton.mousePressed(() => {
+            // go to next page / state
+            window.location.href = "nextPage.html";
+        });
+    }
+}
+
+function drawLoseScreen() {
+    background(100, 0, 0);
+    fill(255);
+    textSize(64);
+    textAlign(CENTER, CENTER);
+    text("Time's Up! You Lose!", width / 2, height / 2);
+
+    // Replay button
+    if (!replayButton) {
+        replayButton = createButton("Replay");
+        replayButton.position(width / 2 - 50, height / 2 + 80);
+        replayButton.size(100, 40);
+        replayButton.mousePressed(() => {
+            // reset game
+            replayButton.remove();
+            replayButton = null;
+            if (continueButton) {
+                continueButton.remove();
+                continueButton = null;
+            }
+            setup(); // restart maze
+            darkgameState = "playing";
+        });
+    }
+}
+
+
+function showDarkWinScreen() {
+    drawWinScreen();
+}
+
+function showDarkLoseScreen() {
+    drawLoseScreen();
+}
+
+

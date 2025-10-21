@@ -28,6 +28,7 @@ let pulseSpeed = 0.08;
 
 //Game states
 let miniGameState = "playing";
+let darkminiGameState = "playing";
 
 //Play Again button
 let playAgainButton;
@@ -56,13 +57,13 @@ function draw() {
     background(bgBrightness, 0, 60); // dark purple base
 
     //Game logic
-    if (miniGameState === "playing") {
+    if (darkminiGameState === "playing") {
         playGame();
     }
-    else if (miniGameState === "win") {
+    else if (darkminiGameState === "win") {
         showWinScreen();
     }
-    else if (miniGameState === "lose") {
+    else if (darkminiGameState === "lose") {
         showLoseScreen();
     }
 
@@ -201,7 +202,7 @@ function resetGame() {
     playerGlow = 0;
     bgBrightness = 30;
     bgTargetBrightness = 30;
-    gameState = "playing";
+    darkgameState = "playing";
     playAgainButton.hide();
 }
 
