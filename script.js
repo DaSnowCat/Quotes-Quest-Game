@@ -34,6 +34,11 @@ let typingSpeed = 5; //smaller = faster typing
 let clickPromptTimer = 0; // counts frames for 5 seconds
 let showClickPrompt = false; // whether to show the prompt
 
+//MUSIC!!!
+let bgMusic;
+
+
+
 
 //PRELOAD FUNCTION (runs only once)
 function preload() {
@@ -46,6 +51,9 @@ function preload() {
 
     //Load Fonts
     gameTitleFont = loadFont('assets/Quivert.ttf');
+
+    //Loading music
+    bgMusic = loadSound("assets/background_music.mp3");
 }
 
 //SETUP FUNCTION (runs only once)
@@ -106,10 +114,13 @@ function setup() {
 
 
 
+
 }
 
 //DRAW FUNCTION (runs in a loop)
 function draw() {
+
+
 
     //The Game States
     if (gameState === "welcome") welcomeScreen();
@@ -317,8 +328,11 @@ function handleTransition() {
 
 //MOUSE INTERACTIONS
 function mousePressed() {
+
+
     if (gameState === "welcome") {
         enterButton.hide();
+        playBackgroundMusic(); //start music here
         startTransition("pathChoice");
     } else if (gameState === "pathChoice") {
         // Detect button clicks manually
@@ -352,5 +366,13 @@ function mousePressed() {
     }
 }
 
-
+function playBackgroundMusic() {
+    if (getAudioContext().state !== "running") {
+        getAudioContext().resume(); // unlock sound on first click
+    }
+    if (!bgMusic.isPlaying()) {
+        bgMusic.loop(); // loop background music
+        bgMusic.setVolume(0.5); // optional: make it softer
+    }
+}
 
